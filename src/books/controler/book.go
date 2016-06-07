@@ -2,6 +2,7 @@ package controler
 
 import (
 	"net/http"
+	"books/dao"
 
 	"github.com/gin-gonic/gin"
 	"github.com/inconshreveable/log15"
@@ -18,5 +19,11 @@ func CreateRouter(logger log15.Logger) http.Handler {
 	//Add Swagger
 	router.StaticFS("/swagger", http.Dir("www/swagger-ui/dist"))
 
+	router.GET("/books", listBooks)
+
 	return router
+}
+
+func listBooks(c *gin.Context) {
+	dao.ListBooks()
 }

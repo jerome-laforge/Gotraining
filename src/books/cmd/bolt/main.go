@@ -2,9 +2,7 @@ package main
 
 import (
 	"books/dao"
-	"time"
 
-	"github.com/boltdb/bolt"
 	"github.com/inconshreveable/log15"
 )
 
@@ -17,17 +15,18 @@ func main() {
 	log15.Root().SetHandler(log15.CallerStackHandler("%+v", log15.StdoutHandler))
 	log15.Info("Startup ...")
 
-	// Open the my.db data file in your current directory.
-	// It will be created if it doesn't exist.
-	db, err := bolt.Open("my.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
+	defer dao.Close()
+	err := dao.InitBucketBooks()
 	if err != nil {
-		log15.Error(err.Error())
+		panic(err)
 	}
-	defer db.Close()
 
-	dao.InitBucketBooks(db)
+	books, err := dao.ListBooks()
+	if err != nil {
+		panic(err)
+	}
 
-	for _, book := range dao.ListBooks(db) {
+	for _, book := range books {
 		b, _ := book.MarshalBinary()
 		log15.Info(string(b))
 	}

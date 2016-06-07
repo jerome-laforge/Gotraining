@@ -2,8 +2,11 @@ package dao
 
 import (
 	"books/dto"
+	"sync"
+	"time"
 
 	"github.com/boltdb/bolt"
+	"github.com/inconshreveable/log15"
 )
 
 /**
@@ -15,8 +18,42 @@ const (
 	bucketBooksName = "books"
 )
 
-func InitBucketBooks(db *bolt.DB) {
-	db.Update(func(tx *bolt.Tx) error {
+var (
+	db     *bolt.DB
+	err    error
+	dbOnce sync.Once
+)
+
+func getDB() (*bolt.DB, error) {
+	dbOnce.Do(func() {
+		// Open the my.db data file in your current directory.
+		// It will be created if it doesn't exist.
+		db, err = bolt.Open("my.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
+		if err != nil {
+			log15.Error(err.Error())
+		}
+	})
+
+	return db, err
+}
+
+func Close() {
+	db, err := getDB()
+	if err != nil {
+		return
+	}
+
+	db.Close()
+	dbOnce = sync.Once{}
+}
+
+func InitBucketBooks() error {
+	db, err := getDB()
+	if err != nil {
+		return err
+	}
+
+	err = db.Update(func(tx *bolt.Tx) error {
 		list, err := tx.CreateBucketIfNotExists([]byte(bucketBooksName))
 		if err != nil {
 			return err
@@ -48,10 +85,17 @@ func InitBucketBooks(db *bolt.DB) {
 
 		return nil
 	})
+
+	return err
 }
 
-func ListBooks(db *bolt.DB) (list []dto.Book) {
-	db.View(func(tx *bolt.Tx) error {
+func ListBooks() (list []dto.Book, err error) {
+	db, err := getDB()
+	if err != nil {
+		return list, err
+	}
+
+	err = db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucketBooksName))
 
 		c := b.Cursor()
