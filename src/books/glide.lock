@@ -1,0 +1,20 @@
+hash: 05426c66e060808a38debd3aa437d0c2dffb3092cde46009bb9de9556ee7a377
+updated: 2016-06-07T12:04:43.176071144+02:00
+imports:
+- name: github.com/boltdb/bolt
+  version: dfb21201d9270c1082d5fb0f07f500311ff72f18
+- name: github.com/go-stack/stack
+  version: 100eb0c0a9c5b306ca2fb4f165df21d80ada4b82
+- name: github.com/inconshreveable/log15
+  version: 20bca5a7a57282e241fac83ec9ea42538027f1c1
+  subpackages:
+  - term
+- name: github.com/mattn/go-colorable
+  version: 9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59
+- name: github.com/mattn/go-isatty
+  version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+- name: golang.org/x/sys
+  version: 076b546753157f758b316e59bcb51e6807c04057
+  subpackages:
+  - unix
+devImports: []
