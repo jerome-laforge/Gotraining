@@ -24,5 +24,6 @@ func main() {
 	}
 
 	router := controler.CreateRouter(log15.New("component", "router"))
-	http.ListenAndServe(":8080", router)
+	err = http.ListenAndServe(":8080", router)
+	log15.Crit("An error has occurred during the startup of server", "err", err)
 }
