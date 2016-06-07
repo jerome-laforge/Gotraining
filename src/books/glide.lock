@@ -1,8 +1,8 @@
-hash: f9b1f3426736d080bf33832949fc2bca76c38d0db9dad0be3b20a5c7a3ec474e
-updated: 2016-06-07T15:20:04.434787095+02:00
+hash: 38b666524b4efde786e7285d4abd14bff9280246372f83aae0bc015bf994ba93
+updated: 2016-06-07T17:23:46.597884611+02:00
 imports:
 - name: github.com/boltdb/bolt
-  version: dfb21201d9270c1082d5fb0f07f500311ff72f18
+  version: 05e441d7b3ded9164c5b912521504e7711dd0ba2
 - name: github.com/gin-gonic/gin
   version: f931d1ea80ae95a6fc739213cdd9399bd2967fb6
   subpackages:
@@ -24,6 +24,8 @@ imports:
   version: 9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59
 - name: github.com/mattn/go-isatty
   version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+- name: github.com/stretchr/testify
+  version: 8d64eb7173c7753d6419fd4a9caf057398611364
 - name: golang.org/x/net
   version: f315505cf3349909cdf013ea56690da34e96a451
   subpackages:

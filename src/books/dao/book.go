@@ -24,14 +24,25 @@ var (
 	dbOnce sync.Once
 )
 
+const DBName = "my.db"
+
 func getDB() (*bolt.DB, error) {
 	dbOnce.Do(func() {
 		// Open the my.db data file in your current directory.
 		// It will be created if it doesn't exist.
-		db, err = bolt.Open("my.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
+		db, err = bolt.Open(DBName, 0600, &bolt.Options{Timeout: 1 * time.Second})
 		if err != nil {
 			log15.Error(err.Error())
+			return
 		}
+
+		err = db.Update(func(tx *bolt.Tx) error {
+			_, err := tx.CreateBucketIfNotExists([]byte(bucketBooksName))
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 	})
 
 	return db, err
@@ -54,10 +65,7 @@ func InitBucketBooks() error {
 	}
 
 	err = db.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists([]byte(bucketBooksName))
-		if err != nil {
-			return err
-		}
+		bucket := tx.Bucket([]byte(bucketBooksName))
 
 		book := dto.Book{
 			Name:   "Le Rouge et le Noir",

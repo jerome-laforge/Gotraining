@@ -14,22 +14,27 @@ import (
  *         <b>Copyright :</b> Orange 2016<br>
  */
 
+const (
+	SwaggerPath = "/swagger"
+	GroupPath   = "/api/v1"
+	BookPath    = "/book"
+	BooksPath   = "/books"
+
+	QueryName = "name"
+)
+
 func CreateRouter(logger log15.Logger) http.Handler {
 	router := gin.Default()
 
 	//Add Swagger
-	router.StaticFS("/swagger", http.Dir("www/swagger-ui/dist"))
+	router.StaticFS(SwaggerPath, http.Dir("www/swagger-ui/dist"))
 
-	apiV1 := router.Group("/api/v1")
-	const (
-		bookPath  = "/book"
-		booksPath = "/books"
-	)
-
-	apiV1.GET(booksPath, listBooks)
-	apiV1.GET(bookPath, getBook)
-	apiV1.POST(bookPath, createBook)
-	apiV1.DELETE(bookPath, deleteBook)
+	// Add business
+	apiV1 := router.Group(GroupPath)
+	apiV1.GET(BooksPath, listBooks)
+	apiV1.GET(BookPath, getBook)
+	apiV1.POST(BookPath, createBook)
+	apiV1.DELETE(BookPath, deleteBook)
 
 	return router
 }
@@ -44,7 +49,7 @@ func listBooks(c *gin.Context) {
 }
 
 func getBook(c *gin.Context) {
-	name := c.Query("name")
+	name := c.Query(QueryName)
 	if name == "" {
 		c.Status(http.StatusBadRequest)
 		return
@@ -88,11 +93,11 @@ func createBook(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.Status(http.StatusCreated)
 }
 
 func deleteBook(c *gin.Context) {
-	name := c.Query("name")
+	name := c.Query(QueryName)
 	if name == "" {
 		c.Status(http.StatusBadRequest)
 		return
