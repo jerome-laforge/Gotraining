@@ -54,7 +54,7 @@ func InitBucketBooks() error {
 	}
 
 	err = db.Update(func(tx *bolt.Tx) error {
-		list, err := tx.CreateBucketIfNotExists([]byte(bucketBooksName))
+		bucket, err := tx.CreateBucketIfNotExists([]byte(bucketBooksName))
 		if err != nil {
 			return err
 		}
@@ -66,7 +66,7 @@ func InitBucketBooks() error {
 		}
 
 		buf, _ := book.MarshalBinary()
-		err = list.Put([]byte(book.Name), buf)
+		err = bucket.Put([]byte(book.Name), buf)
 		if err != nil {
 			return err
 		}
@@ -78,7 +78,7 @@ func InitBucketBooks() error {
 		}
 
 		buf, _ = book.MarshalBinary()
-		err = list.Put([]byte(book.Name), buf)
+		err = bucket.Put([]byte(book.Name), buf)
 		if err != nil {
 			return err
 		}
@@ -96,9 +96,9 @@ func ListBooks() (list []dto.Book, err error) {
 	}
 
 	err = db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(bucketBooksName))
+		bucket := tx.Bucket([]byte(bucketBooksName))
 
-		c := b.Cursor()
+		c := bucket.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			b := dto.Book{}
 			err := b.UnmarshalBinary(v)
@@ -113,4 +113,54 @@ func ListBooks() (list []dto.Book, err error) {
 	})
 
 	return
+}
+
+func GetBook(name string) (book dto.Book, found bool, err error) {
+	db, err := getDB()
+	if err != nil {
+		return book, found, err
+	}
+
+	err = db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketBooksName))
+
+		v := bucket.Get([]byte(name))
+		if v == nil {
+			return err
+		}
+
+		found = true
+
+		err = book.UnmarshalBinary(v)
+		return err
+	})
+
+	return
+}
+
+func CreateBook(book dto.Book) error {
+	db, err := getDB()
+	if err != nil {
+		return err
+	}
+
+	return db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketBooksName))
+
+		buf, _ := book.MarshalBinary()
+		return bucket.Put([]byte(book.Name), buf)
+	})
+}
+
+func DeleteBook(name string) error {
+	db, err := getDB()
+	if err != nil {
+		return err
+	}
+
+	return db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketBooksName))
+
+		return bucket.Delete([]byte(name))
+	})
 }

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"books/controler"
 	"books/dao"
+	"net/http"
 
 	"github.com/inconshreveable/log15"
 )
@@ -21,13 +23,6 @@ func main() {
 		panic(err)
 	}
 
-	books, err := dao.ListBooks()
-	if err != nil {
-		panic(err)
-	}
-
-	for _, book := range books {
-		b, _ := book.MarshalBinary()
-		log15.Info(string(b))
-	}
+	router := controler.CreateRouter(log15.New("component", "router"))
+	http.ListenAndServe(":8080", router)
 }
