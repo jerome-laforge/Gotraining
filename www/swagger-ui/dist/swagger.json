@@ -1,0 +1,73 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Books",
+    "description": "#### Manage library\n"
+  },
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/api/v1",
+  "paths": {
+    "/book": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "List all books",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Book"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new book",
+        "operationId": "addNewBook",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Book to add into library",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Book"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Book": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Author": {
+          "type": "string"
+        },
+        "Price": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}
