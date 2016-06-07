@@ -26,6 +26,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal error"
           }
         }
       }
@@ -52,8 +55,14 @@
               "$ref": "#/definitions/Book"
             }
           },
+          "400": {
+            "description": "Bad request"
+          },
           "404": {
             "description": "Book not found"
+          },
+          "500": {
+            "description": "Internal error"
           }
         }
       },
@@ -78,8 +87,14 @@
           "200": {
             "description": "Book created"
           },
+          "400": {
+            "description": "Bad request"
+          },
           "409": {
             "description": "Book already exists"
+          },
+          "500": {
+            "description": "Internal error"
           }
         }
       },
@@ -98,8 +113,14 @@
           "200": {
             "description": "Book deleted"
           },
+          "400": {
+            "description": "Bad request"
+          },
           "404": {
             "description": "Book not found"
+          },
+          "500": {
+            "description": "Internal error"
           }
         }
       }
