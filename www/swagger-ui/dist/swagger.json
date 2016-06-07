@@ -10,7 +10,7 @@
   ],
   "basePath": "/api/v1",
   "paths": {
-    "/book": {
+    "/books": {
       "get": {
         "responses": {
           "200": {
@@ -26,6 +26,34 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/book": {
+      "get": {
+        "description": "Get book's information",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "name of the book",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Book's information",
+            "schema": {
+              "$ref": "#/definitions/Book"
+            }
+          },
+          "404": {
+            "description": "Book not found"
           }
         }
       },
@@ -48,7 +76,30 @@
         ],
         "responses": {
           "200": {
-            "description": "Created"
+            "description": "Book created"
+          },
+          "409": {
+            "description": "Book already exists"
+          }
+        }
+      },
+      "delete": {
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "name of the book",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "description": "Delete this book",
+        "responses": {
+          "200": {
+            "description": "Book deleted"
+          },
+          "404": {
+            "description": "Book not found"
           }
         }
       }
