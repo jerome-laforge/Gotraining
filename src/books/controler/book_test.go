@@ -12,8 +12,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/inconshreveable/log15"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/net/context"
 )
 
 /**
@@ -21,14 +21,12 @@ import (
  *         <b>Copyright :</b> Orange 2016<br>
  */
 
-var logger = log15.New(log15.Ctx{"component": "test"})
-
 func TestCreateBookAndCheckIt(t *testing.T) {
-	router := controler.CreateRouter(logger)
+	router := controler.CreateRouter()
 	server := httptest.NewServer(router)
 	defer os.Remove(dao.DBName)
 	defer server.Close()
-	defer dao.Close()
+	defer dao.Close(context.Background())
 
 	book := dto.Book{
 		Name:   "Le Grand Meaulnes",

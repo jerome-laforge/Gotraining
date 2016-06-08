@@ -2,11 +2,12 @@ package dao
 
 import (
 	"books/dto"
+	"books/log"
 	"sync"
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/inconshreveable/log15"
+	"golang.org/x/net/context"
 )
 
 /**
@@ -26,19 +27,20 @@ var (
 
 const DBName = "my.db"
 
-func getDB() (*bolt.DB, error) {
+func getDB(ctx context.Context) (*bolt.DB, error) {
 	dbOnce.Do(func() {
 		// Open the my.db data file in your current directory.
 		// It will be created if it doesn't exist.
 		db, err = bolt.Open(DBName, 0600, &bolt.Options{Timeout: 1 * time.Second})
 		if err != nil {
-			log15.Error(err.Error())
+			log.GetLoggerFromContext(ctx).Error(err.Error())
 			return
 		}
 
 		err = db.Update(func(tx *bolt.Tx) error {
 			_, err := tx.CreateBucketIfNotExists([]byte(bucketBooksName))
 			if err != nil {
+				log.GetLoggerFromContext(ctx).Error("impossible to create bucket", "name", bucketBooksName, "err", err)
 				return err
 			}
 			return nil
@@ -48,8 +50,8 @@ func getDB() (*bolt.DB, error) {
 	return db, err
 }
 
-func Close() {
-	db, err := getDB()
+func Close(ctx context.Context) {
+	db, err := getDB(ctx)
 	if err != nil {
 		return
 	}
@@ -58,8 +60,8 @@ func Close() {
 	dbOnce = sync.Once{}
 }
 
-func InitBucketBooks() error {
-	db, err := getDB()
+func InitBucketBooks(ctx context.Context) error {
+	db, err := getDB(ctx)
 	if err != nil {
 		return err
 	}
@@ -76,6 +78,7 @@ func InitBucketBooks() error {
 		buf, _ := book.MarshalBinary()
 		err = bucket.Put([]byte(book.Name), buf)
 		if err != nil {
+			log.GetLoggerFromContext(ctx).Error("Impossible to store the data", "err", err)
 			return err
 		}
 
@@ -88,6 +91,7 @@ func InitBucketBooks() error {
 		buf, _ = book.MarshalBinary()
 		err = bucket.Put([]byte(book.Name), buf)
 		if err != nil {
+			log.GetLoggerFromContext(ctx).Error("Impossible to store the data", "err", err)
 			return err
 		}
 
@@ -97,8 +101,8 @@ func InitBucketBooks() error {
 	return err
 }
 
-func ListBooks() (list []dto.Book, err error) {
-	db, err := getDB()
+func ListBooks(ctx context.Context) (list []dto.Book, err error) {
+	db, err := getDB(ctx)
 	if err != nil {
 		return list, err
 	}
@@ -111,6 +115,7 @@ func ListBooks() (list []dto.Book, err error) {
 			b := dto.Book{}
 			err := b.UnmarshalBinary(v)
 			if err != nil {
+				log.GetLoggerFromContext(ctx).Error("Impossible to UnmarshalBinary", "err", err)
 				continue
 			}
 
@@ -123,8 +128,8 @@ func ListBooks() (list []dto.Book, err error) {
 	return
 }
 
-func GetBook(name string) (book dto.Book, found bool, err error) {
-	db, err := getDB()
+func GetBook(ctx context.Context, name string) (book dto.Book, found bool, err error) {
+	db, err := getDB(ctx)
 	if err != nil {
 		return book, found, err
 	}
@@ -134,20 +139,25 @@ func GetBook(name string) (book dto.Book, found bool, err error) {
 
 		v := bucket.Get([]byte(name))
 		if v == nil {
+			log.GetLoggerFromContext(ctx).Info("Book not found", "bookName", name)
 			return err
 		}
 
 		found = true
 
 		err = book.UnmarshalBinary(v)
-		return err
+		if err != nil {
+			log.GetLoggerFromContext(ctx).Error("Impossible to UnmarshalBinary", "err", err, "value", string(v))
+			return err
+		}
+		return nil
 	})
 
 	return
 }
 
-func CreateBook(book dto.Book) error {
-	db, err := getDB()
+func CreateBook(ctx context.Context, book dto.Book) error {
+	db, err := getDB(ctx)
 	if err != nil {
 		return err
 	}
@@ -156,12 +166,17 @@ func CreateBook(book dto.Book) error {
 		bucket := tx.Bucket([]byte(bucketBooksName))
 
 		buf, _ := book.MarshalBinary()
-		return bucket.Put([]byte(book.Name), buf)
+		err = bucket.Put([]byte(book.Name), buf)
+		if err != nil {
+			log.GetLoggerFromContext(ctx).Error("Impossible to store the data", "err", err)
+			return err
+		}
+		return nil
 	})
 }
 
-func DeleteBook(name string) error {
-	db, err := getDB()
+func DeleteBook(ctx context.Context, name string) error {
+	db, err := getDB(ctx)
 	if err != nil {
 		return err
 	}
@@ -169,6 +184,11 @@ func DeleteBook(name string) error {
 	return db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketBooksName))
 
-		return bucket.Delete([]byte(name))
+		err := bucket.Delete([]byte(name))
+		if err != nil {
+			log.GetLoggerFromContext(ctx).Error("Impossible to delete the data", "err", err)
+			return err
+		}
+		return nil
 	})
 }

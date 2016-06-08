@@ -1,5 +1,5 @@
-hash: 38b666524b4efde786e7285d4abd14bff9280246372f83aae0bc015bf994ba93
-updated: 2016-06-07T17:23:46.597884611+02:00
+hash: 5d85900812c851a2d03d3e50c0a7779e5889bb724283b25b6f6940c7592e0edf
+updated: 2016-06-08T09:17:14.918298713+02:00
 imports:
 - name: github.com/boltdb/bolt
   version: 05e441d7b3ded9164c5b912521504e7711dd0ba2
@@ -24,6 +24,8 @@ imports:
   version: 9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59
 - name: github.com/mattn/go-isatty
   version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+- name: github.com/satori/go.uuid
+  version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: github.com/stretchr/testify
   version: 8d64eb7173c7753d6419fd4a9caf057398611364
 - name: golang.org/x/net

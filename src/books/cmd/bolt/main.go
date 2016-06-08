@@ -3,9 +3,10 @@ package main
 import (
 	"books/controler"
 	"books/dao"
+	"books/log"
 	"net/http"
 
-	"github.com/inconshreveable/log15"
+	"golang.org/x/net/context"
 )
 
 /**
@@ -14,16 +15,16 @@ import (
  */
 
 func main() {
-	log15.Root().SetHandler(log15.CallerStackHandler("%+v", log15.StdoutHandler))
-	log15.Info("Startup ...")
+	defer dao.Close(context.Background())
+	logger := log.GetLogger()
+	logger.Info("Startup ...")
 
-	defer dao.Close()
-	err := dao.InitBucketBooks()
+	err := dao.InitBucketBooks(context.Background())
 	if err != nil {
 		panic(err)
 	}
 
-	router := controler.CreateRouter(log15.New("component", "router"))
+	router := controler.CreateRouter()
 	err = http.ListenAndServe(":8080", router)
-	log15.Crit("An error has occurred during the startup of server", "err", err)
+	logger.Crit("An error has occurred during the startup of server", "err", err)
 }
