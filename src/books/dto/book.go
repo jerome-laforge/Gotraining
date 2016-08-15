@@ -1,11 +1,19 @@
 package dto
 
-import "encoding/json"
+import (
+	"bytes"
+
+	"github.com/ugorji/go/codec"
+)
 
 /**
  * @author Jérôme LAFORGE - Orange / IMT / OLPS / SOFT
  *         <b>Copyright :</b> Orange 2016<br>
  */
+
+var (
+	mh codec.MsgpackHandle
+)
 
 type Book struct {
 	Name   string
@@ -13,10 +21,12 @@ type Book struct {
 	Price  uint
 }
 
-func (b Book) MarshalBinary() ([]byte, error) {
-	return json.Marshal(b)
+func (b Book) Marshal() ([]byte, error) {
+	var data bytes.Buffer
+	err := codec.NewEncoder(&data, &mh).Encode(b)
+	return data.Bytes(), err
 }
 
-func (b *Book) UnmarshalBinary(data []byte) error {
-	return json.Unmarshal(data, b)
+func (b *Book) Unmarshal(data []byte) error {
+	return codec.NewDecoderBytes(data, &mh).Decode(&b)
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"books/dao"
+	"fmt"
 
 	"github.com/inconshreveable/log15"
 )
@@ -27,7 +28,6 @@ func main() {
 	}
 
 	for _, book := range books {
-		b, _ := book.MarshalBinary()
-		log15.Info(string(b))
+		log15.Info(fmt.Sprintf("%#v", book))
 	}
 }

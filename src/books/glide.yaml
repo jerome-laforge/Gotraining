@@ -2,3 +2,4 @@ package: books
 import:
 - package: github.com/inconshreveable/log15
 - package: github.com/boltdb/bolt
+- package: github.com/ugorji/go

@@ -65,7 +65,7 @@ func InitBucketBooks() error {
 			Price:  5,
 		}
 
-		buf, _ := book.MarshalBinary()
+		buf, _ := book.Marshal()
 		err = list.Put([]byte(book.Name), buf)
 		if err != nil {
 			return err
@@ -77,7 +77,7 @@ func InitBucketBooks() error {
 			Price:  0,
 		}
 
-		buf, _ = book.MarshalBinary()
+		buf, _ = book.Marshal()
 		err = list.Put([]byte(book.Name), buf)
 		if err != nil {
 			return err
@@ -101,7 +101,7 @@ func ListBooks() (list []dto.Book, err error) {
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			b := dto.Book{}
-			err := b.UnmarshalBinary(v)
+			err := b.Unmarshal(v)
 			if err != nil {
 				continue
 			}
